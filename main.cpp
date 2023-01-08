@@ -16,7 +16,6 @@ struct Account {
     string password;
     int score;
 };
-
 unordered_map<string, Account> accounts;
 
 string signUp() {
@@ -29,7 +28,6 @@ string signUp() {
         cout << "Enter a new password: ";
         cin >> password;
 
-        // Check if the password is strong enough.
         regex passwordRegex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*]).{8,}$");
         if (!regex_match(password, passwordRegex)) {
             cout << "Error: password is not strong enough. It must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one digit, and one special character." << endl;
@@ -38,21 +36,19 @@ string signUp() {
         }
     }
 
-    // Create a new account and add it to the map of accounts.
     Account account = {username, password, 0};
     accounts[username] = account;
 
-    // Open the accounts file in append mode.
     ofstream accountsFile(ACCOUNTS_FILE, ios::app);
-    // Write the new account to the file.
+
     accountsFile << username << " " << password << " " << 0 << endl;
-    // Close the file.
+
     accountsFile.close();
+
     return username ;
 }
 
 string signIn() {
-
     string username, password;
     cout << "Enter your username: ";
     cin >> username;
@@ -67,7 +63,6 @@ string signIn() {
         return "" ;
     }
 }
-
 void showLeaderboard() {
     vector<Account> accountList;
     for (const auto& [username, account] : accounts) {
@@ -78,7 +73,6 @@ void showLeaderboard() {
         return a.score > b.score;
     });
 
-    // Print the leaderboard.
     cout << "LEADERBOARD" << endl;
     cout << "Username\tScore" << endl;
     for (const Account& account : accountList) {
@@ -86,6 +80,88 @@ void showLeaderboard() {
     }
 }
 
+int N;
+
+vector<vector<int>> puzzle;
+
+void printPuzzle()
+{
+    system("cls");
+    cout << endl;
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            if(puzzle[i][j] == 0)
+                cout << "    ";
+            else if(puzzle[i][j]/10 > 0)
+                cout << puzzle[i][j] << "  ";
+            else
+                cout << puzzle[i][j] << "   ";
+        }
+        cout << endl;
+    }
+}
+
+bool isSolved()
+{
+    int count = 1;
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            if (puzzle[i][j] != count)
+            {
+                if(puzzle[i][j]==0 && i==N-1 && j==N-1)
+                    return true ;
+                return false;
+            }
+            count++;
+        }
+    }
+    return true;
+}
+
+void shufflePuzzle()
+{
+    for (int i = 0; i < N * N; i++)
+    {
+        int r = rand() % (N * N);
+        int x1 = i / N;
+        int y1 = i % N;
+        int x2 = r / N;
+        int y2 = r % N;
+        swap(puzzle[x1][y1], puzzle[x2][y2]);
+    }
+}
+
+void findEmptyTile(int &x, int &y)
+{
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            if (puzzle[i][j] == 0)
+            {
+                x = i;
+                y = j;
+                return;
+            }
+        }
+    }
+}
+
+bool moveTile(int dx, int dy)
+{
+    int x, y;
+    findEmptyTile(x, y);
+    if (x + dx < 0 || x + dx >= N || y + dy < 0 || y + dy >= N)
+    {
+        return false;
+    }
+    swap(puzzle[x][y], puzzle[x + dx][y + dy]);
+    return true;
+}
 string username_acount(string user= ""){
     while(user=="")
     {
@@ -102,36 +178,39 @@ string username_acount(string user= ""){
     }
     return user;
 }
+void incrementScore(const string& username) {
+  if (accounts.count(username)) {
+    ++accounts[username].score;
 
+    ofstream accountsFile(ACCOUNTS_FILE);
+    for (const auto& [username, account] : accounts) {
+      accountsFile << username << " " << account.password << " " << account.score << endl;
+    }
+    accountsFile.close();
+  } else {
+    cout << "Error: username not found." << endl;
+  }
+}
 int main()
 {
     string user;
-    // seed the random number generator
     srand(time(0));
-    // A map to store the user accounts.
 
-    // Open the accounts file in read mode.
     ifstream accountsFile(ACCOUNTS_FILE);
-    // Read the account information from the file and add it to the map.
     string username, password;
     int score;
     while (accountsFile >> username >> password >> score) {
         Account account = {username, password, score};
         accounts[username] = account;
     }
-    // Close the file.
     accountsFile.close();
 
-    // Prompt the user to sign up or sign in.
     user = username_acount() ;
-    // get the size of the puzzle from the user
     cout << "Enter the size of the puzzle (e.g. 4 for a 4x4 puzzle): ";
     cin >> N;
 
-    // create the puzzle
     puzzle = vector<vector<int>>(N, vector<int>(N));
 
-    // initialize the puzzle
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
@@ -141,13 +220,10 @@ int main()
     }
     puzzle[N - 1][N - 1] = 0;
 
-    // shuffle the puzzle
     shufflePuzzle();
 
-    // print the puzzle
     printPuzzle();
 
-    // loop until the puzzle is solved
     while (!isSolved())
     {
         cout << "Enter your move (WASD or Q to quit): ";
