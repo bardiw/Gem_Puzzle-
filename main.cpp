@@ -39,33 +39,30 @@ string signUp() {
         regex passwordRegex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*]).{8,}$");
         if (!regex_match(password, passwordRegex)) {
             cout << "Error: password is not strong enough. It must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one digit, and one special character." << endl;
-        }
-        else {
+        } else {
             passwordValid = true;
         }
     }
 
-    Account account = { username, password, 0 };
+    Account account = {username, password, 0};
     accounts[username] = account;
 
     ofstream accountsFile(ACCOUNTS_FILE, ios::app);
     accountsFile << username << " " << password << " " << 0 << endl;
     accountsFile.close();
-    return username;
+    return username ;
 }
-string username_acount(string user = "") {
-    while (user == "")
+string username_acount(string user= ""){
+    while(user=="")
     {
         cout << "Would you like to sign up (1) or sign in (2) or play as an guest (3)? ";
         int choice;
         cin >> choice;
         if (choice == 1) {
             user = signUp();
-        }
-        else if (choice == 2) {
+        } else if (choice == 2) {
             user = signIn();
-        }
-        else if (choice == 3) {
+        } else if  (choice == 3){
             user = "Guest6957624";
         }
         else {
@@ -74,16 +71,16 @@ string username_acount(string user = "") {
     }
     return user;
 }
-string ADMIN() {
+string ADMIN(){
     cout << "Enter the size of the puzzle (e.g. 4 for a 4x4 puzzle): ";
     cin >> N;
-    if (N >= 4)
+    if ( N >= 4)
     {
         M *= (N - 2);
     }
 
-    string user = username_acount();
-    return user;
+    string user = username_acount() ;
+    return user ;
 }
 
 string signIn() {
@@ -92,22 +89,21 @@ string signIn() {
     cin >> username;
     cout << "Enter your password: ";
     cin >> password;
-    if (username == "Anorak")
+    if ( username == "Anorak")
     {
-        if (password == "Anor@k10")
+        if ( password == "Anor@k10")
             ADMIN();
     }
     else
-    {
-        if (accounts.count(username) && accounts[username].password == password) {
-            cout << "Welcome back, " << username << "!" << endl;
-            return username;
+        {
+            if (accounts.count(username) && accounts[username].password == password) {
+                cout << "Welcome back, " << username << "!" << endl;
+                return username ;
+            } else {
+                cout << "Invalid username or password." << endl;
+                return "" ;
+            }
         }
-        else {
-            cout << "Invalid username or password." << endl;
-            return "";
-        }
-    }
 }
 void showLeaderboard() {
     vector<Account> accountList;
@@ -117,7 +113,7 @@ void showLeaderboard() {
 
     sort(accountList.begin(), accountList.end(), [](const Account& a, const Account& b) {
         return a.score > b.score;
-        });
+    });
 
     cout << "LEADERBOARD" << endl;
     cout << "Username\tScore" << endl;
@@ -136,28 +132,28 @@ void printPuzzle()
     {
         for (int j = 0; j < N; j++)
         {
-            if (puzzle[i][j] == 0)
+            if(puzzle[i][j] == 0)
                 cout << "    ";
-            else if (puzzle[i][j] / 10 > 0)
+            else if(puzzle[i][j]/10 > 0)
                 cout << puzzle[i][j] << "  ";
             else
                 cout << puzzle[i][j] << "   ";
         }
         cout << endl;
     }
-    cout << "You have";
+    cout << "You have" ;
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (M > m / 3)
+    if ( M > m/3)
     {
         SetConsoleTextAttribute(h, 0xA);
-        cout << M;
+        cout << M ;
         SetConsoleTextAttribute(h, 0xf);
         cout << " moves left!!" << endl;
     }
-    else if (M <= m / 3)
+    else if( M <= m/3 )
     {
         SetConsoleTextAttribute(h, 0x4);
-        cout << M;
+        cout << M ;
         SetConsoleTextAttribute(h, 0xf);
         cout << " moves left!!" << endl;
     }
@@ -172,8 +168,8 @@ bool isSolved()
         {
             if (puzzle[i][j] != count)
             {
-                if (puzzle[i][j] == 0 && i == N - 1 && j == N - 1)
-                    return true;
+                if(puzzle[i][j]==0 && i==N-1 && j==N-1)
+                    return true ;
                 return false;
             }
             count++;
@@ -195,7 +191,7 @@ void shufflePuzzle()
     }
 }
 
-void findEmptyTile(int& x, int& y)
+void findEmptyTile(int &x, int &y)
 {
     for (int i = 0; i < N; i++)
     {
@@ -219,11 +215,11 @@ bool moveTile(int dx, int dy)
     {
         return false;
     }
-    redoStack.push({ dx, dy });
+    redoStack.push({dx, dy});
     swap(puzzle[x][y], puzzle[x + dx][y + dy]);
     return true;
 }
-void redoMoves(int count, int redu) {
+void redoMoves(int count , int redu) {
     for (int i = 0; i < count; i++) {
         if (redu == 0) {
             HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -241,15 +237,15 @@ void redoMoves(int count, int redu) {
     }
 }
 void incrementScore(const string& username) {
-    if (accounts.count(username)) {
-        ++accounts[username].score;
+  if (accounts.count(username)) {
+    ++accounts[username].score;
 
-        ofstream accountsFile(ACCOUNTS_FILE);
-        for (const auto& [username, account] : accounts) {
-            accountsFile << username << " " << account.password << " " << account.score << endl;
-        }
-        accountsFile.close();
+    ofstream accountsFile(ACCOUNTS_FILE);
+    for (const auto& [username, account] : accounts) {
+      accountsFile << username << " " << account.password << " " << account.score << endl;
     }
+    accountsFile.close();
+  }
 }
 
 int main()
@@ -261,12 +257,12 @@ int main()
     string username, password;
     int score;
     while (accountsFile >> username >> password >> score) {
-        Account account = { username, password, score };
+        Account account = {username, password, score};
         accounts[username] = account;
     }
     accountsFile.close();
 
-    user = username_acount();
+    user = username_acount() ;
 
     puzzle = vector<vector<int>>(N, vector<int>(N));
 
@@ -301,45 +297,45 @@ int main()
         if (ch == 'W' || ch == 'w')
         {
             success = moveTile(-1, 0);
-            if (success)
+            if(success)
             {
-                redu++;
+                redu ++ ;
                 M--;
             }
         }
         else if (ch == 'A' || ch == 'a')
         {
             success = moveTile(0, -1);
-            if (success)
+            if(success)
             {
-                redu++;
+                redu ++;
                 M--;
             }
         }
         else if (ch == 'S' || ch == 's')
         {
             success = moveTile(1, 0);
-            if (success)
+            if(success)
             {
-                redu++;
+                redu ++ ;
                 M--;
             }
         }
         else if (ch == 'D' || ch == 'd')
         {
             success = moveTile(0, 1);
-            if (success)
+            if(success)
             {
-                redu++;
+                redu ++ ;
                 M--;
             }
         }
-        else if ((ch == 'R' || ch == 'r'))
+        else if ((ch == 'R' || ch == 'r') )
         {
-            redoMoves(1, redu);
-            success = true;
-            redu = 0;
-            M--;
+                redoMoves(1 , redu);
+                success = true ;
+                redu = 0 ;
+                M--;
         }
 
         printPuzzle();
@@ -358,8 +354,16 @@ int main()
         SetConsoleTextAttribute(h, 0xA);
         cout << "Congratulations, you solved the puzzle!" << endl;
         SetConsoleTextAttribute(h, 0xf);
-        incrementScore(user);
+        incrementScore(user) ;
         showLeaderboard();
+    }
+    else
+    {
+        Beep(600,1000);
+        HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+        SetConsoleTextAttribute(h, 0x4);
+        cout << "YOU DID NOT SOLVE THE PUZZLE!!" << endl;
+        SetConsoleTextAttribute(h, 0xf);
     }
     return 0;
 }
